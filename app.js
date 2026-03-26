@@ -1,4 +1,7 @@
 (() => {
+  const SUPABASE_URL = 'https://hivbkvwcjosnhzhuptfg.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhpdmJrdndjam9zbmh6aHVwdGZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTA5ODIsImV4cCI6MjA5MDA4Njk4Mn0.6cAS4ZakPQqAcBk8DvfqFIaBT3cUCJNftgaHQjhGwoc';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   /* =========================
      設定
      ========================= */
@@ -150,55 +153,55 @@
     if (btnCopyEvent) {
       btnCopyEvent.addEventListener("click", onCopyEvent);
     }
+        // 読み込みボタンを「手動更新」ボタンとして使う、または初期ロード
+    if (btnLoad) btnLoad.addEventListener("click", fetchTasks);
+    
+    // 保存ボタンの動作を差し替え
+    if (btnSaveEvent) {
+      btnSaveEvent.replaceWith(btnSaveEvent.cloneNode(true)); // 既存のイベントをクリア
+      document.getElementById("btnSaveEvent").addEventListener("click", (e) => {
+        e.preventDefault();
+        onSaveTask();
+      });
+    }
 
-    resetAll();
+    // 起動時に自動でデータ取得
+    fetchTasks();
   }
 
   /* =========================
      読み込み
      ========================= */
-  async function onLoad() {
-    try {
-      if (!fileSnapshot || !fileSnapshot.files || !fileSnapshot.files[0]) {
-        alert("スナップショット（tasks_snapshot.json）を選択してくれ！");
-        return;
-      }
+  async function fetchTasks() {
+    if (loadStatus) loadStatus.textContent = "同期中...";
+    
+    // tasksテーブルから全件取得
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .order('updated_at', { ascending: false });
 
-      if (loadStatus) loadStatus.textContent = "読み込み中…";
-
-      // snapshot
-      baseTasks = await readJsonFile(fileSnapshot.files[0]);
-      if (!Array.isArray(baseTasks)) throw new Error("スナップショットJSONは配列である必要がある。");
-
-      // events（任意）
-      const evFiles = fileEvents ? Array.from(fileEvents.files || []) : [];
-      const evts = [];
-      for (const f of evFiles) {
-        try {
-          const obj = await readJsonFile(f);
-          if (obj && typeof obj === "object") evts.push(obj);
-        } catch {
-          // 個別失敗は無視（1個壊れてても止めない）
-        }
-      }
-      events = uniqueEvents(evts);
-
-      // merge
-      mergedTasks = merge(baseTasks, events);
-
-      // assignees
-      const assignees = Array.from(new Set(mergedTasks.map(t => t.assignee).filter(Boolean)))
-        .sort((a, b) => String(a).localeCompare(String(b), "ja"));
-      setSelectOptions(filterAssignee, ["すべて", ...assignees]);
-
-      renderAll();
-
-      if (loadStatus) loadStatus.textContent = `読み込み完了：タスク ${mergedTasks.length}件 / イベント ${events.length}件`;
-    } catch (e) {
-      console.error(e);
-      alert(`読み込みに失敗した…原因：${e.message}`);
-      if (loadStatus) loadStatus.textContent = "";
+    if (error) {
+      console.error(error);
+      if (loadStatus) loadStatus.textContent = "同期失敗";
+      return;
     }
+
+    // アプリ内の変数 mergedTasks にデータを格納
+    mergedTasks = data.map(t => ({
+      id: t.id,
+      title: t.title,
+      assignee: t.assignee,
+      status: t.status,
+      due: t.due,
+      priority: t.priority,
+      holdReason: t.hold_reason,
+      updatedAt: t.updated_at,
+      updatedBy: t.updated_by
+    }));
+
+    renderAll();
+    if (loadStatus) loadStatus.textContent = `同期完了 (${mergedTasks.length}件)`;
   }
 
   async function readJsonFile(file) {
@@ -612,9 +615,7 @@
     return { eventId, type, taskId, payload, actor, at };
   }
 
-  function onGenerateEventDownload() {
-    hideNotice();
-
+  async function onSaveTask() {
     const v = validateDialog();
     if (!v.ok) {
       showNotice(v.message, "warn");
@@ -622,27 +623,27 @@
     }
 
     const form = v.data;
-    const before = (currentEdit?.mode === "edit") ? currentEdit.taskBefore : null;
-    const type = (currentEdit?.mode === "new") ? "Create" : "Update";
-    const payload = buildEventPayload(before, form);
+    const taskData = {
+      id: form.id,
+      title: form.title,
+      assignee: form.assignee,
+      status: form.status,
+      priority: form.priority,
+      due: form.due,
+      hold_reason: form.holdReason,
+      updated_at: new Date().toISOString(),
+      updated_by: form.actor
+    };
 
-    // Create最低限保証
-    if (type === "Create") {
-      if (!payload.title) payload.title = form.title;
-      if (!payload.status) payload.status = form.status;
-      if (!payload.priority) payload.priority = form.priority;
+    // Supabaseへ保存（あれば更新、なければ作成）
+    const { error } = await supabase.from('tasks').upsert(taskData);
+
+    if (error) {
+      alert("保存に失敗したぞ... " + error.message);
+    } else {
+      if (taskDialog) taskDialog.close();
+      fetchTasks(); // 一覧を再取得
     }
-
-    const evt = createEventObject(type, form.id, payload, form.actor);
-
-    downloadJson(evt, `${evt.eventId}.json`);
-
-    // 画面上に即反映（共有は events/ に保存して初めてだ）
-    events = uniqueEvents([...events, evt]);
-    mergedTasks = merge(baseTasks, events);
-    renderAll();
-
-    showNotice("よし！イベントJSONをDLした。共有フォルダの data/events/ に保存してくれ！", "info");
   }
 
   async function onCopyEvent() {
