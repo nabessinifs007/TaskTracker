@@ -1,0 +1,35 @@
+[
+  {
+    "id": "TASK-0001",
+    "title": "【Creage Account＋】Control Tower運用フロー修正",
+    "assignee": "渡邊",
+    "status": "進行中",
+    "due": "2026-03-31",
+    "priority": "高",
+    "holdReason": "",
+    "updatedAt": "2026-03-26T15:09:22+09:00",
+    "updatedBy": "渡邊"
+  },
+  {
+    "id": "TASK-0002",
+    "title": "【本番作業】クラブツーリズム様：管理アカウント上のIAMポリシー変更",
+    "assignee": "渡邊",
+    "status": "未着手",
+    "due": "2026-03-30",
+    "priority": "高",
+    "holdReason": "",
+    "updatedAt": "2026-03-26T15:10:29+09:00",
+    "updatedBy": "渡邊"
+  },
+  {
+    "id": "TASK-0003",
+    "title": "【JP/金窓システム】BIツール検討",
+    "assignee": "渡邊",
+    "status": "進行中",
+    "due": "2026-04-30",
+    "priority": "中",
+    "holdReason": "",
+    "updatedAt": "2026-03-26T15:11:43+09:00",
+    "updatedBy": "渡邊"
+  }
+]

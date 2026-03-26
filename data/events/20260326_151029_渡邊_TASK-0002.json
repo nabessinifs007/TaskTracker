@@ -1,0 +1,15 @@
+{
+  "eventId": "20260326_151029_渡邊_TASK-0002",
+  "type": "Create",
+  "taskId": "TASK-0002",
+  "payload": {
+    "title": "【本番作業】クラブツーリズム様：管理アカウント上のIAMポリシー変更",
+    "assignee": "渡邊",
+    "status": "未着手",
+    "due": "2026-03-30",
+    "priority": "高",
+    "holdReason": ""
+  },
+  "actor": "渡邊",
+  "at": "2026-03-26T15:10:29+09:00"
+}

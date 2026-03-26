@@ -1,0 +1,685 @@
+/* ==========================================
+   TaskTracker Styles (トラッくんテーマ 🐯)
+   - file://運用（外部依存なし）
+   - テーブル中心の高密度UI
+   - オレンジ・ブラウンを基調とした親しみやすいデザイン
+   ========================================== */
+
+:root{
+  /* base (背景や文字色を少し温かみのある色に) */
+  --bg: #fffaf0;       /* ほんのりオレンジがかった背景 */
+  --panel: #ffffff;
+  --panel2: #fffdfa;
+  --text: #3d261d;     /* 墨黒ではなく、濃いブラウン */
+  --muted: #82665b;    /* 薄いブラウン */
+  --line: #fce8d5;     /* 線の色もオレンジ系に */
+  --line-strong: #fbcfb1;
+
+  /* brand (トラッくんのテーマカラー) */
+  --brand: #f97316;    /* オレンジ */
+  --brand2: #f59e0b;   /* アンバー（黄土色） */
+  --tora: #f59e0b;     /* トラアクセント */
+  
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #22c55e;
+
+  /* shadows */
+  --shadow-1: 0 8px 18px rgba(138, 64, 18, 0.05);
+  --shadow-2: 0 18px 45px rgba(138, 64, 18, 0.08);
+  --shadow-3: 0 24px 70px rgba(138, 64, 18, 0.12);
+
+  /* density */
+  --fz: 12.5px;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --focus: rgba(249, 115, 22, 0.18);
+
+  /* status */
+  --s-gray: #64748b;
+  --s-blue: #2563eb;
+  --s-amber: #d97706;
+  --s-red: #dc2626;
+  --s-green: #16a34a;
+
+  --soft-gray: rgba(100,116,139,.12);
+  --soft-blue: rgba(37, 99, 235, 0.14);
+  --soft-amber: rgba(217,119,6,.16);
+  --soft-red: rgba(239,68,68,.14);
+  --soft-green: rgba(34,197,94,.16);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-size: var(--fz);
+  font-family: "M PLUS Rounded 1c", ui-rounded, ui-sans-serif, system-ui, -apple-system, sans-serif; /* 少し丸っこいフォントを優先 */
+  color: var(--text);
+  /* 背景のモヤッとしたグラデーションもオレンジ系に */
+  background:
+    radial-gradient(900px 600px at 10% 0%, rgba(249, 115, 22, 0.08), transparent 55%),
+    radial-gradient(900px 600px at 85% 10%, rgba(245, 158, 11, 0.06), transparent 55%),
+    radial-gradient(900px 600px at 80% 90%, rgba(251, 146, 60, 0.08), transparent 60%),
+    var(--bg);
+}
+
+/* ------------------------------------------
+   Header
+------------------------------------------ */
+.header{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 10px 14px;
+  background: rgba(246,248,255,.78);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  overflow: visible;
+}
+.header::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:-1px;
+  height:2px;
+  background: linear-gradient(90deg, var(--brand), var(--brand2), rgba(245,158,11,0));
+}
+.header__left{ display:flex; flex-direction:column; gap:3px; }
+.header__right{ display:flex; align-items:center; gap:8px; }
+
+.title{
+  margin:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size: 16px;
+  font-weight: 1000;
+  letter-spacing: .2px;
+}
+.subtitle{
+  margin:0;
+  font-size: 11px;
+  color: #415670;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* トラッくん（ヘッダ） */
+/* ヒーロー（上部大表示）の場合は高さを制限 */
+.heroTorakun__img{
+  max-height: 170px;   /* ←ここが効く */
+  width: 100%;
+  object-fit: contain;
+}
+
+.heroTorakun{
+  padding: 8px;
+  margin: 8px 0 10px;
+}
+
+.heroTorakun__left{
+  padding: 10px 12px;
+}
+
+.heroTorakun__right{
+  padding: 0 10px 0;
+  align-items: flex-end;
+}
+
+.title__name{ font-weight:1000; }
+.title__tag{
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(11,18,32,.55);
+  background: rgba(245,158,11,.14);
+  border: 1px solid rgba(245,158,11,.18);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* ------------------------------------------
+   Layout
+------------------------------------------ */
+.container{
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 10px 10px 40px;
+}
+
+.card{
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--panel), var(--panel2));
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 10px 22px rgba(16,24,40,.08);
+}
+
+.card__title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight: 1000;
+  font-size: 12px;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed #eaf2ff;
+}
+.card__title::before{
+  content:"";
+  width:10px; height:10px;
+  border-radius: 3px;
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+}
+
+.grid{ display:grid; gap:8px; }
+.grid--2{ grid-template-columns: 1fr 1fr; }
+@media (max-width:900px){ .grid--2{ grid-template-columns: 1fr; } }
+
+.block{ display:flex; flex-direction:column; gap:4px; }
+.label{ font-size:11px; color: var(--muted); font-weight: 850; }
+.hint{ font-size:11px; color: #6b7e98; line-height: 1.35; }
+code{
+  background:#f1f6ff;
+  border:1px solid #e0ecff;
+  border-radius: 8px;
+  padding: 1px 6px;
+}
+
+/* ------------------------------------------
+   Inputs
+------------------------------------------ */
+select, input, textarea{
+  width:100%;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background:#fff;
+  color: var(--text);
+  outline:none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+select:focus, input:focus, textarea:focus{
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 4px var(--focus);
+}
+textarea{ resize:vertical; line-height:1.35; }
+
+/* ------------------------------------------
+   Buttons / Pills
+------------------------------------------ */
+.row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top: 8px;
+}
+.row--space{ justify-content:space-between; }
+
+.btn{
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 900;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  box-shadow: 0 1px 0 rgba(16,24,40,.02);
+}
+.btn:hover{
+  transform: translateY(-1px);
+  border-color: #c7d9f3;
+  box-shadow: 0 14px 28px rgba(16,24,40,.10);
+}
+.btn:active{ transform: translateY(0); }
+
+.btn--primary{
+  border: none;
+  color:#fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+  box-shadow: 0 18px 30px rgba(79,70,229,.24);
+}
+.btn--primary:hover{
+  box-shadow: 0 24px 44px rgba(79,70,229,.30);
+}
+.btn--ghost{
+  background: linear-gradient(180deg, #ffffff, #f7fbff);
+}
+
+.pill{
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  font-size: 11.5px;
+  font-weight: 1000;
+  box-shadow: 0 10px 18px rgba(16,24,40,.06);
+}
+.status{ font-size:11px; color: var(--muted); }
+
+/* ------------------------------------------
+   Filters (toolbar)
+------------------------------------------ */
+.filters{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:8px;
+  padding: 8px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, #ffffff, #f7fbff);
+  box-shadow: 0 8px 18px rgba(16,24,40,.06);
+}
+.filter{
+  min-width: 140px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.filter--wide{ flex:1; min-width: 220px; }
+
+/* ------------------------------------------
+   Stats
+------------------------------------------ */
+.stats{
+  display:grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+@media (max-width:900px){
+  .stats{ grid-template-columns: repeat(2, 1fr); }
+}
+.stat{
+  padding: 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  position: relative;
+  overflow:hidden;
+}
+.stat::after{
+  content:"";
+  position:absolute;
+  inset:auto -40px -40px auto;
+  width:120px; height:120px;
+  background: radial-gradient(circle, rgba(79,70,229,.18), transparent 60%);
+  transform: rotate(20deg);
+}
+.stat__label{ font-size: 11px; color: var(--muted); font-weight: 850; position:relative; z-index:1; }
+.stat__value{ font-size: 20px; font-weight: 1000; margin-top: 6px; position:relative; z-index:1; }
+
+/* ------------------------------------------
+   Table
+------------------------------------------ */
+.tableWrap{
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  overflow:auto;
+  box-shadow: var(--shadow-1);
+}
+
+.table{
+  width:100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1000px;
+}
+
+th, td{
+  padding: 6px 8px;
+  font-size: 12px;
+  border-bottom: 1px solid #edf3ff;
+  background:#fff;
+  vertical-align: top;
+}
+th{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: linear-gradient(180deg, #ffffff, #f5f9ff);
+  color: #0b1220;
+  font-weight: 1000;
+  border-bottom: 1px solid var(--line-strong);
+  cursor: pointer;
+  user-select: none;
+}
+td{
+  border-right: 1px solid #f2f6ff;
+}
+
+tr:nth-child(even) td{
+  background: #f8fbff;
+}
+tr:hover td{
+  background: rgba(79,70,229,.09) !important;
+}
+
+/* column widths */
+.table th:nth-child(1), .table td:nth-child(1){ width:110px; }
+.table th:nth-child(3), .table td:nth-child(3){ width:110px; }
+.table th:nth-child(5), .table td:nth-child(5){ width:70px; }
+.table th:nth-child(6), .table td:nth-child(6){ width:105px; }
+.table th:nth-child(7), .table td:nth-child(7){ width:150px; }
+.table th:nth-child(8), .table td:nth-child(8){ width:80px; }
+
+/* title ellipsis */
+.table td:nth-child(2){
+  max-width: 560px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* sticky columns (ID/担当/ステータス) */
+.table th:nth-child(1), .table td:nth-child(1){
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  box-shadow: 10px 0 18px rgba(16,24,40,.04);
+}
+.table th:nth-child(3), .table td:nth-child(3){
+  position: sticky;
+  left: 110px;
+  z-index: 6;
+  box-shadow: 10px 0 18px rgba(16,24,40,.04);
+}
+.table th:nth-child(4), .table td:nth-child(4){
+  position: sticky;
+  left: 220px;
+  z-index: 6;
+  border-right: 1px solid var(--line-strong);
+  box-shadow: 10px 0 18px rgba(16,24,40,.05);
+}
+
+/* ------------------------------------------
+   Badge / Status
+------------------------------------------ */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  font-size: 11.5px;
+  font-weight: 1000;
+  color: #0b1220;
+}
+
+/* status backgrounds */
+.badge--未着手{ background: var(--soft-gray); color:#334155; }
+.badge--進行中{ background: var(--soft-blue); color:#1d4ed8; }
+.badge--確認待ち{ background: var(--soft-amber); color:#b45309; }
+.badge--保留中{ background: var(--soft-red); color:#b91c1c; }
+.badge--完了{ background: var(--soft-green); color:#166534; }
+
+/* 期限強調 */
+.due--over{
+  color:#b91c1c;
+  font-weight: 1000;
+  background: rgba(239,68,68,.14);
+  border: 1px solid rgba(239,68,68,.22);
+  border-radius: 6px;
+  padding: 2px 6px;
+  display:inline-block;
+}
+.due--soon{
+  color:#b45309;
+  font-weight: 1000;
+  background: rgba(249,115,22,.16);
+  border: 1px solid rgba(249,115,22,.22);
+  border-radius: 6px;
+  padding: 2px 6px;
+  display:inline-block;
+}
+
+/* ------------------------------------------
+   バッジ内：ミニトラッくん（画像）
+------------------------------------------ */
+.miniMascotImg{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  object-fit: cover;
+  margin-right:6px;
+  background: linear-gradient(135deg, #fb923c, var(--tora));
+  box-shadow: 0 6px 10px rgba(245,158,11,.18);
+}
+
+/* 画像1枚のまま「小物」を重ねて状態差分を作る */
+.miniWrap{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  margin-right:6px;
+}
+.miniMark{
+  position:absolute;
+  right:-2px;
+  top:-2px;
+  width:14px;
+  height:14px;
+  border-radius:999px;
+  background:#94a3b8;
+  border:2px solid #fff;
+  box-shadow: 0 6px 10px rgba(16,24,40,.10);
+}
+.miniMark--未着手{ background:#94a3b8; }
+.miniMark--進行中{ background:#3b82f6; }
+.miniMark--確認待ち{ background:#f59e0b; }
+.miniMark--保留中{ background:#ef4444; }
+.miniMark--完了{ background:#22c55e; }
+
+/* ------------------------------------------
+   Dialog
+------------------------------------------ */
+.dialog{
+  border:none;
+  padding:0;
+  max-width: 780px;
+  width: calc(100% - 24px);
+  background: transparent;
+}
+dialog::backdrop{ background: rgba(16,24,40,.55); }
+.dialog__body{
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow-3);
+  padding: 12px;
+}
+.dialog__header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  padding: 10px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(135deg, rgba(245,158,11,.12), rgba(6,182,212,.08));
+  border-bottom: 1px solid #eef4ff;
+}
+.dialog__title{ font-size: 14px; font-weight: 1000; margin:0; }
+.dialog__subtitle{ font-size: 11px; color: var(--muted); margin-top:4px; }
+.dialog__content{ margin-top: 10px; display:flex; flex-direction:column; gap:10px; }
+.dialog__footer{ margin-top: 10px; display:flex; flex-direction:column; gap:8px; }
+
+.notice{
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: #f7fbff;
+  display:none;
+}
+.notice--warn{
+  border-color: #fecaca;
+  background: #fff1f2;
+  color:#7f1d1d;
+}
+
+.help{ line-height: 1.8; }
+
+.torakunDock {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  width: 200px; /* ★ トラッくんを大きく（130pxから200pxに） */
+  height: auto;
+  display: flex;
+  flex-direction: column; /* 吹き出しを上、画像を下に */
+  align-items: flex-end; /* 右寄せ */
+  pointer-events: none; /* マウスイベントを通す */
+}
+.torakunDock img{
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+@media (max-width: 900px){
+  .torakunDock{ width: 140px; }
+}
+
+/* ===================================
+   ヘッダ：全身トラッくん（小さめ）
+   - 重要：object-fit: contain で見切れ防止
+   =================================== */
+
+.mascotImg--full{
+  width: 120px;          /* ← まずは56。まだ足りなければ64 */
+  height: 120px;
+  padding: 0 !important;           /* 背景が出ないように */
+  background: transparent !important;
+  box-shadow: none !important;     /* 影を戻したければ下に別途指定 */
+  border-radius: 10px;  /* 角丸不要なら 0 に */
+  object-fit: contain;  /* 全身を切らずに収める */
+
+  /* はみ出し演出：下に少し突き出す */
+  transform: translateY(12px) translateX(-10px);
+}
+
+/* =========================
+   集計（吹き出し）：トラッくん全身表示
+   ========================= */
+.emptyState__img--full{
+  width: 64px;       /* 全身は横より縦が必要 */
+  height: 64px;
+  border-radius: 14px;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;  /* 全身を切らない */
+}
+
+/* 吹き出しと並べた時に上が揃うように */
+.emptyState{
+  align-items: flex-start;
+}
+
+/* ふわふわ動かすためのアニメーション定義（CSSの末尾などに追加） */
+@keyframes floatTorakun {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+.torakunDock img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  /* ↓ アニメーションを適用（3秒かけて無限に繰り返す） */
+  animation: floatTorakun 3s ease-in-out infinite;
+}
+
+/* --- 修正 (styles.cssの一番下付近にあるのを上書き) --- */
+.torakunDock img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  /* ↓ アニメーションを適用（3秒かけて無限に繰り返す） */
+  animation: floatTorakun 3s ease-in-out infinite;
+}
+
+/* ▼▼ styles.cssの一番下に追加 ▼▼ */
+/* ------------------------------------------
+   右下トラッくんの吹き出し（新しいスタイル）
+------------------------------------------ */
+/* 1. トラッくん全体の大きさと配置 */
+.torakunDock {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  width: 200px; /* ★ トラッくんを大きく（200pxに） */
+  height: auto;
+  display: flex;
+  flex-direction: column; /* 吹き出しを上、画像を下に */
+  align-items: flex-end; /* 右寄せ */
+  pointer-events: none; /* マウスイベントを通す */
+}
+
+/* 2. 吹き出し本体 */
+.toraSpeechBubble {
+  position: relative;
+  background: #ffffff; /* 白い背景 */
+  border: 2px solid var(--tora); /* トラッくんカラーの枠線 */
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-3); /* 強めの影 */
+  margin-bottom: -10px; /* トラッくんの頭に少し重ねる */
+  margin-right: 80px; /* ★ トラッくんの口元に寄せる */
+  z-index: 1001; /* トラッくん本体より上に */
+  opacity: 1; /* 常に表示 */
+  max-width: 400px; /* 吹き出しの最大幅 */
+  width: 250px;     /* ★ 新しく追加。ここの数値を大きくするほど左に広がります（例: 280px, 300px など） */
+  transition: opacity 0.3s;
+  /* 吹き出しもふわふわ動かす */
+  animation: floatBubble 3s ease-in-out infinite;
+}
+
+/* 吹き出しのテキスト */
+.toraSpeechBubble p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+/* 3. 吹き出しのしっぽ（三角） */
+.toraSpeechBubble::after {
+  content: "";
+  position: absolute;
+  bottom: -15px; /* 下にはみ出す */
+  right: 50px; /* ★ トラッくんの口元の真上あたりを指す */
+  border-width: 15px 12px 0;
+  border-style: solid;
+  border-color: #ffffff transparent; /* 白い三角 */
+  /* 三角部分にも影を付ける */
+  filter: drop-shadow(0 6px 10px rgba(138, 64, 18, 0.1));
+}
+
+/* トラッくん本体のアニメーション定義（既に定義されているはずだが、念のため） */
+@keyframes floatTorakun {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
+}
+
+/* 吹き出し専用のふわふわアニメーション定義 */
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); } /* 画像より少し大きく動かす */
+}
+/* ▲▲ ここまで ▲▲ */

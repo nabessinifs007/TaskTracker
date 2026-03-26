@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TaskTracker（トラッくん）</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header__left">
+      <h1 class="title">
+        <span class="title__name">TaskTracker</span>
+      </h1>
+      <p class="subtitle">file://運用（共有フォルダ）｜テーブルでタスク状況を可視化</p>
+    </div>
+
+    <div class="header__right">
+      <button id="btnHelp" class="btn btn--ghost">使い方</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ① データ読込 -->
+    <section class="card">
+      <div class="card__title">① データ読込</div>
+
+      <div class="grid grid--2">
+        <div class="block">
+          <label class="label">スナップショット（tasks_snapshot.json）</label>
+          <input id="fileSnapshot" type="file" accept=".json,application/json" />
+          <div class="hint">
+            共有フォルダの <code>data/snapshot/tasks_snapshot.json</code> を選択
+          </div>
+        </div>
+
+        <div class="block">
+          <label class="label">イベント（data/events/ 配下の *.json）</label>
+          <input id="fileEvents" type="file" accept=".json,application/json" multiple />
+          <div class="hint">
+            複数選択OK（Ctrl/Shift）。イベントが無いなら未選択でもOK
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnLoad" class="btn btn--primary">読み込み</button>
+        <button id="btnClear" class="btn btn--ghost">リセット</button>
+        <div id="loadStatus" class="status"></div>
+      </div>
+    </section>
+
+    <!-- ② 表示・絞り込み -->
+    <section class="card">
+      <div class="card__title">② 表示・絞り込み</div>
+
+      <div class="filters">
+        <div class="filter">
+          <label class="label">担当者</label>
+          <select id="filterAssignee"></select>
+        </div>
+
+        <div class="filter">
+          <label class="label">ステータス</label>
+          <select id="filterStatus"></select>
+        </div>
+
+        <div class="filter">
+          <label class="label">優先度</label>
+          <select id="filterPriority"></select>
+        </div>
+
+        <div class="filter">
+          <label class="label">期限</label>
+          <select id="filterDue"></select>
+        </div>
+
+        <div class="filter filter--wide">
+          <label class="label">検索（タイトル/ID/担当者）</label>
+          <input id="filterQuery" type="text" placeholder="例：TASK-0001 / 渡邊 / IAM" />
+        </div>
+      </div>
+
+      <div class="row row--space">
+        <div class="row">
+          <button id="btnNewTask" class="btn">＋ 新規タスク</button>
+          <button id="btnExportSnapshot" class="btn">スナップショット生成（DL）</button>
+        </div>
+
+        <div class="row">
+          <span class="pill" id="pillCounts">0件</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ 集計 -->
+    <section class="card">
+      <div class="card__title">③ 集計</div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <!-- ④ タスク一覧 -->
+    <section class="card">
+      <div class="card__title">④ タスク一覧</div>
+
+      <div class="tableWrap">
+        <table class="table" id="tasksTable">
+          <thead>
+            <tr>
+              <th data-sort="id">ID</th>
+              <th data-sort="title">タイトル</th>
+              <th data-sort="assignee">担当</th>
+              <th data-sort="status">ステータス</th>
+              <th data-sort="priority">優先度</th>
+              <th data-sort="due">期限</th>
+              <th data-sort="updatedAt">更新日</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tasksTbody"></tbody>
+        </table>
+      </div>
+
+      <div class="hint">
+        更新は「編集」→「イベント生成（DL）」→ 共有フォルダ <code>data/events/</code> へ保存だ！
+      </div>
+    </section>
+  </main>
+
+  <div class="torakunDock" aria-hidden="true">
+    <div class="toraSpeechBubble">
+      <p id="torakunTalkText">任せろ！ まずは「+新規タスク」だ。<br>ひとつ作れば全部動き出すぞ！ 🐯</p>
+    </div>
+    <img src="./assets/torakun_full_cut.png" alt="" />
+  </div>
+
+  <!-- タスク編集/新規（モーダル） -->
+  <dialog id="taskDialog" class="dialog">
+    <form method="dialog" class="dialog__body">
+      <div class="dialog__header">
+        <div>
+          <div class="dialog__title" id="dlgTitle">タスク編集</div>
+          <div class="dialog__subtitle" id="dlgSubtitle"></div>
+        </div>
+        <button class="btn btn--ghost" value="cancel">閉じる</button>
+      </div>
+
+      <div class="dialog__content">
+        <div class="grid grid--2">
+          <div class="block">
+            <label class="label">ID</label>
+            <input id="dlgId" type="text" disabled />
+            <div class="hint">新規の場合は自動採番</div>
+          </div>
+
+          <div class="block">
+            <label class="label">担当者</label>
+            <input id="dlgAssignee" type="text" placeholder="例：渡邊" />
+          </div>
+        </div>
+
+        <div class="block">
+          <label class="label">タイトル</label>
+          <input id="dlgTitleInput" type="text" placeholder="例：IAMポリシー調整の影響確認" />
+        </div>
+
+        <div class="grid grid--2">
+          <div class="block">
+            <label class="label">ステータス</label>
+            <select id="dlgStatus"></select>
+          </div>
+
+          <div class="block">
+            <label class="label">優先度</label>
+            <select id="dlgPriority">
+              <option>高</option>
+              <option selected>中</option>
+              <option>低</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="block">
+            <label class="label">期限</label>
+            <input id="dlgDue" type="date" />
+          </div>
+
+          <div class="block">
+            <label class="label">更新者（actor）</label>
+            <input id="dlgActor" type="text" placeholder="例：渡邊" />
+            <div class="hint">イベントの actor に入る。自分の名前でOKだ！</div>
+          </div>
+        </div>
+
+        <div class="block">
+          <label class="label">コメント（任意）</label>
+          <textarea id="dlgComment" rows="3" placeholder="例：レビュー依頼した／顧客回答待ち など"></textarea>
+        </div>
+
+        <div class="block">
+          <label class="label">保留理由（ステータスが「保留中」の場合は必須）</label>
+          <textarea id="dlgHoldReason" rows="2" placeholder="例：顧客回答待ち、承認待ち、情報不足 など"></textarea>
+        </div>
+
+        <div class="notice" id="dlgNotice"></div>
+      </div>
+
+      <div class="dialog__footer">
+        <div class="row">
+          <button id="btnSaveEvent" class="btn btn--primary" value="ok">イベント生成（DL）</button>
+          <button id="btnCopyEvent" class="btn" type="button">イベントJSONをコピー</button>
+        </div>
+        <div class="hint">
+          ※ file:// では自動保存できない。DLしたJSONを共有フォルダ <code>data/events/</code> に保存してくれ！
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 使い方（ヘルプ） -->
+  <dialog id="helpDialog" class="dialog">
+    <form method="dialog" class="dialog__body">
+      <div class="dialog__header">
+        <div>
+          <div class="dialog__title">使い方（トラッくん）</div>
+          <div class="dialog__subtitle">サーバ無し（file://）で共有する手順だ！</div>
+        </div>
+        <button class="btn btn--ghost" value="cancel">閉じる</button>
+      </div>
+
+      <div class="dialog__content">
+        <ol class="help">
+          <li>共有フォルダの <code>index.html</code> を開く（file://）。</li>
+          <li><b>スナップショット</b>：<code>data/snapshot/tasks_snapshot.json</code> を選ぶ。</li>
+          <li><b>イベント</b>：<code>data/events/</code> の <code>*.json</code> を必要分だけ複数選択（無ければ未選択でOK）。</li>
+          <li>「読み込み」で一覧と集計が出る！</li>
+          <li>更新は「編集」→「イベント生成（DL）」→ <code>data/events/</code> に保存。これが共有のカギだ。</li>
+          <li>イベントが増えてきたら「スナップショット生成（DL）」で軽量化していこう。</li>
+        </ol>
+      </div>
+
+      <div class="dialog__footer">
+        <button class="btn btn--primary" value="ok">了解！</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>

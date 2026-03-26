@@ -1,0 +1,15 @@
+{
+  "eventId": "20260326_150922_渡邊_TASK-0001",
+  "type": "Create",
+  "taskId": "TASK-0001",
+  "payload": {
+    "title": "【Creage Account＋】Control Tower運用フロー修正",
+    "assignee": "渡邊",
+    "status": "進行中",
+    "due": "2026-03-31",
+    "priority": "高",
+    "holdReason": ""
+  },
+  "actor": "渡邊",
+  "at": "2026-03-26T15:09:22+09:00"
+}
