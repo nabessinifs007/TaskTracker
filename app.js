@@ -113,7 +113,7 @@
     setSelectOptions(dlgStatus, STATUSES);
 
     // ボタン
-    if (btnLoad) btnLoad.addEventListener("click", onLoad);
+    if (btnLoad) btnLoad.addEventListener("click", fetchTasks);
     if (btnClear) btnClear.addEventListener("click", resetAll);
     if (btnNewTask) btnNewTask.addEventListener("click", openDialogForNew);
     if (btnExportSnapshot) btnExportSnapshot.addEventListener("click", exportSnapshot);
