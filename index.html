@@ -15,7 +15,7 @@
       <h1 class="title">
         <span class="title__name">TaskTracker</span>
       </h1>
-      <p class="subtitle">file://運用（共有フォルダ）｜テーブルでタスク状況を可視化</p>
+      <p class="subtitle">テーブルでタスク状況を可視化</p>
     </div>
 
     <div class="header__right">
@@ -24,36 +24,6 @@
   </header>
 
   <main class="container">
-
-    <!-- ① データ読込 -->
-    <section class="card">
-      <div class="card__title">① データ読込</div>
-
-      <div class="grid grid--2">
-        <div class="block">
-          <label class="label">スナップショット（tasks_snapshot.json）</label>
-          <input id="fileSnapshot" type="file" accept=".json,application/json" />
-          <div class="hint">
-            共有フォルダの <code>data/snapshot/tasks_snapshot.json</code> を選択
-          </div>
-        </div>
-
-        <div class="block">
-          <label class="label">イベント（data/events/ 配下の *.json）</label>
-          <input id="fileEvents" type="file" accept=".json,application/json" multiple />
-          <div class="hint">
-            複数選択OK（Ctrl/Shift）。イベントが無いなら未選択でもOK
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <button id="btnLoad" class="btn btn--primary">読み込み</button>
-        <button id="btnClear" class="btn btn--ghost">リセット</button>
-        <div id="loadStatus" class="status"></div>
-      </div>
-    </section>
-
     <!-- ② 表示・絞り込み -->
     <section class="card">
       <div class="card__title">② 表示・絞り込み</div>
@@ -88,7 +58,6 @@
       <div class="row row--space">
         <div class="row">
           <button id="btnNewTask" class="btn">＋ 新規タスク</button>
-          <button id="btnExportSnapshot" class="btn">スナップショット生成（DL）</button>
         </div>
 
         <div class="row">
@@ -126,7 +95,7 @@
       </div>
 
       <div class="hint">
-        更新は「編集」→「イベント生成（DL）」→ 共有フォルダ <code>data/events/</code> へ保存だ！
+        更新は「編集」から行ってくれ！ 保存すれば即座にクラウドへ反映されるぞ。
       </div>
     </section>
   </main>
@@ -212,12 +181,7 @@
 
       <div class="dialog__footer">
         <div class="row">
-          <button id="btnSaveEvent" class="btn btn--primary" value="ok">イベント生成（DL）</button>
-          <button id="btnCopyEvent" class="btn" type="button">イベントJSONをコピー</button>
-        </div>
-        <div class="hint">
-          ※ file:// では自動保存できない。DLしたJSONを共有フォルダ <code>data/events/</code> に保存してくれ！
-        </div>
+          <button id="btnSaveEvent" class="btn btn--primary" value="ok">保存する</button>
       </div>
     </form>
   </dialog>

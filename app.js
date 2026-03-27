@@ -204,90 +204,6 @@
     if (loadStatus) loadStatus.textContent = `同期完了 (${mergedTasks.length}件)`;
   }
 
-  async function readJsonFile(file) {
-    const text = await file.text();
-    return JSON.parse(text);
-  }
-
-  function uniqueEvents(evts) {
-    const map = new Map();
-    for (const e of evts) {
-      const id = e?.eventId;
-      if (!id) continue;
-      if (!map.has(id)) map.set(id, e);
-    }
-    // 時刻順に並べる
-    return Array.from(map.values()).sort((a, b) => {
-      const ta = Date.parse(a.at || "") || 0;
-      const tb = Date.parse(b.at || "") || 0;
-      return ta - tb;
-    });
-  }
-
-  /* =========================
-     merge（snapshot + events）
-     ========================= */
-  function merge(snapshotTasks, evts) {
-    const map = new Map();
-    for (const t of snapshotTasks) {
-      if (!t?.id) continue;
-      map.set(String(t.id), normalizeTask(t));
-    }
-    for (const e of evts) {
-      applyEvent(map, e);
-    }
-    return Array.from(map.values());
-  }
-
-  function normalizeTask(t) {
-    return {
-      id: String(t.id),
-      title: t.title || "",
-      assignee: t.assignee || "",
-      status: STATUSES.includes(t.status) ? t.status : "未着手",
-      due: t.due || "",
-      priority: PRIORITIES.includes(t.priority) ? t.priority : "中",
-      holdReason: t.holdReason || "",
-      updatedAt: t.updatedAt || "",
-      updatedBy: t.updatedBy || "",
-    };
-  }
-
-  function applyEvent(taskMap, evt) {
-    // { eventId, type: 'Create'|'Update', taskId, payload:{...}, actor, at }
-    const type = evt?.type || "Update";
-    const taskId = evt?.taskId ? String(evt.taskId) : null;
-    const payload = evt?.payload || {};
-    const actor = evt?.actor || "";
-    const at = evt?.at || "";
-
-    if (!taskId) return;
-
-    if (type === "Create") {
-      const base = taskMap.get(taskId) || { id: taskId };
-      const merged = normalizeTask({
-        ...base,
-        ...payload,
-        id: taskId,
-        updatedAt: at,
-        updatedBy: actor,
-      });
-      taskMap.set(taskId, merged);
-      return;
-    }
-
-    // Update
-    const current = taskMap.get(taskId) || normalizeTask({ id: taskId });
-    const next = normalizeTask({
-      ...current,
-      ...payload,
-      id: taskId,
-      updatedAt: at || current.updatedAt,
-      updatedBy: actor || current.updatedBy,
-    });
-    taskMap.set(taskId, next);
-  }
-
   /* =========================
      表示
      ========================= */
@@ -388,7 +304,6 @@
 
   /* =========================
      テーブル描画
-     - バッジ内にミニトラッくん画像＋小物マーク
      ========================= */
   function renderTable(rows) {
     if (!tasksTbody) return;
@@ -402,11 +317,8 @@
 
       tr.innerHTML = `
         <td><code>${escapeHtml(t.id)}</code></td>
-
         <td title="${escapeHtml(t.title)}">${escapeHtml(t.title)}</td>
-
         <td>${escapeHtml(t.assignee || "")}</td>
-
         <td>
           <span class="badge badge--${escapeHtml(t.status)}">
             <span class="miniWrap" aria-hidden="true">
@@ -420,30 +332,50 @@
             : ""
           }
         </td>
-
         <td>${escapeHtml(t.priority)}</td>
-
         <td class="${dueClass}">${escapeHtml(t.due || "")}</td>
-
         <td><small>${escapeHtml(formatUpdated(t.updatedAt, t.updatedBy))}</small></td>
-
         <td>
           <button class="btn btn--ghost btnEdit" data-id="${escapeHtml(t.id)}">編集</button>
+          <button class="btn btn--ghost btnDelete" data-id="${escapeHtml(t.id)}" style="color: var(--s-red);">削除</button>
         </td>
       `;
-
       frag.appendChild(tr);
     }
 
     tasksTbody.appendChild(frag);
 
-    // 編集ボタン
+    // 編集ボタンのイベント
     tasksTbody.querySelectorAll(".btnEdit").forEach(b => {
       b.addEventListener("click", () => {
         const id = b.getAttribute("data-id");
         openDialogForEdit(id);
       });
     });
+
+    // 削除ボタンのイベント
+    tasksTbody.querySelectorAll(".btnDelete").forEach(b => {
+      b.addEventListener("click", () => {
+        const id = b.getAttribute("data-id");
+        onDeleteTask(id);
+      });
+    });
+  }
+
+  async function onDeleteTask(taskId) {
+    if (!confirm(`タスク ${taskId} を削除していいか？ 戻せないぞ！ 🐯`)) return;
+
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', taskId);
+
+    if (error) {
+      alert("削除に失敗したぞ... " + error.message);
+    } else {
+      showNotice("タスクを削除したぞ！", "info");
+      fetchTasks(); // 成功したら一覧を再取得
+    }
   }
 
   function dueCssClass(dueStr) {
@@ -506,8 +438,8 @@
       taskBefore: { ...task }
     };
 
-    if (dlgTitle) dlgTitle.textContent = "タスク編集（イベント生成）";
-    if (dlgSubtitle) dlgSubtitle.textContent = `ID: ${task.id}｜任せろ、更新イベントを作るぞ。`;
+    if (dlgTitle) dlgTitle.textContent = "タスク編集";
+    if (dlgSubtitle) dlgSubtitle.textContent = `ID: ${task.id}｜任せろ、情報を更新するぞ。`;
 
     if (dlgId) dlgId.value = task.id;
     if (dlgAssignee) dlgAssignee.value = task.assignee || "";
@@ -532,8 +464,8 @@
       newId
     };
 
-    if (dlgTitle) dlgTitle.textContent = "新規タスク作成（イベント生成）";
-    if (dlgSubtitle) dlgSubtitle.textContent = "よし、1枚イベントを切るぞ。";
+    if (dlgTitle) dlgTitle.textContent = "新規タスク作成";
+    if (dlgSubtitle) dlgSubtitle.textContent = "よし、新しいタスクを登録するぞ。";
 
     if (dlgId) dlgId.value = newId;
     if (dlgAssignee) dlgAssignee.value = "";
@@ -593,28 +525,6 @@
     };
   }
 
-  function buildEventPayload(beforeTask, form) {
-    const payload = {};
-    const fields = ["title", "assignee", "status", "due", "priority", "holdReason"];
-
-    for (const f of fields) {
-      const newVal = form[f] ?? "";
-      const oldVal = beforeTask ? (beforeTask[f] ?? "") : "";
-      if (!beforeTask || String(newVal) !== String(oldVal)) {
-        payload[f] = newVal;
-      }
-    }
-
-    if (form.comment) payload.comment = form.comment;
-    return payload;
-  }
-
-  function createEventObject(type, taskId, payload, actor) {
-    const at = nowIsoJst();
-    const eventId = `${yyyymmdd_hhmmss()}_${safeFileName(actor)}_${safeFileName(taskId)}`;
-    return { eventId, type, taskId, payload, actor, at };
-  }
-
   async function onSaveTask() {
     const v = validateDialog();
     if (!v.ok) {
@@ -644,89 +554,6 @@
       if (taskDialog) taskDialog.close();
       fetchTasks(); // 一覧を再取得
     }
-  }
-
-  async function onCopyEvent() {
-    hideNotice();
-
-    const v = validateDialog();
-    if (!v.ok) {
-      showNotice(v.message, "warn");
-      return;
-    }
-
-    const form = v.data;
-    const before = (currentEdit?.mode === "edit") ? currentEdit.taskBefore : null;
-    const type = (currentEdit?.mode === "new") ? "Create" : "Update";
-    const payload = buildEventPayload(before, form);
-
-    const evt = createEventObject(type, form.id, payload, form.actor);
-
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(evt, null, 2));
-      showNotice("コピー完了だ！必要ならテキストに貼り付けて保存してくれ。", "info");
-    } catch {
-      showNotice("コピーに失敗した…（権限かも）DLでいこう。", "warn");
-    }
-  }
-
-  /* =========================
-     スナップショット生成（DL）
-     ========================= */
-  function exportSnapshot() {
-    if (!mergedTasks.length) {
-      alert("まず読み込みをしてくれ！");
-      return;
-    }
-
-    const snapshot = mergedTasks.map(t => ({
-      id: t.id,
-      title: t.title,
-      assignee: t.assignee,
-      status: t.status,
-      due: t.due,
-      priority: t.priority,
-      holdReason: t.holdReason || "",
-      updatedAt: t.updatedAt || "",
-      updatedBy: t.updatedBy || "",
-    }));
-
-    downloadJson(snapshot, `tasks_snapshot_${yyyymmdd_hhmmss()}.json`);
-
-    alert(
-      "スナップショットをDLしたぞ！\n" +
-      "共有フォルダの data/snapshot/tasks_snapshot.json を置き換えると軽くなる。\n" +
-      "（イベントは必要に応じて整理してくれ）"
-    );
-  }
-
-  /* =========================
-     リセット
-     ========================= */
-  function resetAll() {
-    baseTasks = [];
-    events = [];
-    mergedTasks = [];
-
-    sortKey = "updatedAt";
-    sortDir = "desc";
-
-    if (tasksTbody) tasksTbody.innerHTML = "";
-    if (stats) stats.innerHTML = "";
-    if (pillCounts) pillCounts.textContent = "0件";
-    if (loadStatus) loadStatus.textContent = "";
-
-    if (filterAssignee) filterAssignee.value = "すべて";
-    if (filterPriority) filterPriority.value = "すべて";
-    if (filterDue) filterDue.value = "すべて";
-    if (filterQuery) filterQuery.value = "";
-    if (filterStatus) filterStatus.value = FILTER_STATUS_NOT_DONE;
-
-    if (emptyState) emptyState.hidden = true;
-
-    // file input reset（ブラウザ制約で失敗する場合あり）
-    try { if (fileSnapshot) fileSnapshot.value = ""; } catch {}
-    try { if (fileEvents) fileEvents.value = ""; } catch {}
   }
 
   /* =========================
@@ -794,18 +621,6 @@
 
   function safeFileName(s) {
     return (s || "").replace(/[^\w\-ぁ-んァ-ヶ一-龠々ー]/g, "_");
-  }
-
-  function downloadJson(obj, filename) {
-    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
   }
 
   function updateTorakunTalk(rows){
