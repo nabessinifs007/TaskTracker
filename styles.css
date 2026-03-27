@@ -633,7 +633,7 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   display: flex;
   flex-direction: column; /* 吹き出しを上、画像を下に */
   align-items: flex-end; /* 右寄せ */
-  pointer-events: none; /* マウスイベントを通す */
+  cursor: grab;
 }
 
 /* 2. 吹き出し本体 */
