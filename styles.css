@@ -639,9 +639,8 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
 /* 2. 吹き出し本体 */
 .toraSpeechBubble {
   position: absolute;
-  bottom: 92%; /* 少し下げてトラッくんの頭に近づける */
-  left: 28%; /* 50%から28%に変更。トラッくんの顔の真上に移動 */
-  transform: translateX(-50%);
+  bottom: 80%; /* トラッくんの顔の少し上くらいまで下げる */
+  left: 0%; /* 中央揃えをやめて、左側（顔の側）に寄せる */
   margin-bottom: 5px;
   background: #ffffff;
   border: 2px solid var(--tora);
@@ -649,7 +648,7 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   padding: 10px 14px;
   box-shadow: var(--shadow-3);
   width: max-content;
-  max-width: 250px;
+  max-width: 220px;
   animation: floatBubble 3s ease-in-out infinite;
 }
 
@@ -663,14 +662,13 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   text-align: center;
 }
 
-/* 3. 吹き出しのしっぽ（口元へ向かって斜めに尖らせる） */
+/* 3. 吹き出しのしっぽ（顔の中心・口元へ向ける） */
 .toraSpeechBubble::after {
   content: "";
   position: absolute;
   bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 10px 0 0 14px; /* 直角三角形にして右下（口元）へ向ける */
+  left: 55px; /* トラッくんの口元に合わせてしっぽの位置を左にずらす */
+  border-width: 10px 10px 0; /* まっすぐ下に向かって尖る */
   border-style: solid;
   border-color: #ffffff transparent transparent transparent;
   z-index: 2;
@@ -680,13 +678,13 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   content: "";
   position: absolute;
   bottom: -13px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 12px 0 0 17px; /* 外枠も同じ形に合わせる */
+  left: 53px; /* 枠線の太さ（2px）分ずらす */
+  border-width: 12px 12px 0;
   border-style: solid;
   border-color: var(--tora) transparent transparent transparent;
   z-index: 1;
 }
+
 
 /* トラッくん本体のアニメーション定義（既に定義されているはずだが、念のため） */
 @keyframes floatTorakun {
