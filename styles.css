@@ -699,3 +699,159 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   50% { transform: translateY(-7px); } /* 画像より少し大きく動かす */
 }
 /* ▲▲ ここまで ▲▲ */
+
+/* ==========================================
+   New CSS Enhancements (Toast, Sort, Inline Edit, Mobile Cards)
+   ========================================== */
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.toast {
+  background: #333;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast--show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast--info { background: #3b82f6; }
+.toast--success { background: #10b981; }
+.toast--warn { background: #f59e0b; color: #fff; }
+.toast--error { background: #ef4444; }
+
+/* Sort Indicators */
+.sort-icon {
+  font-size: 10px;
+  color: var(--brand);
+  margin-left: 4px;
+  display: inline-block;
+}
+.th-active {
+  background: #f0f5ff;
+}
+
+/* Inline Status Select */
+.inline-status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.inlineStatusSelect {
+  padding: 2px 20px 2px 8px;
+  font-size: 11.5px;
+  font-weight: 1000;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 12px;
+}
+.inlineStatusSelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249,115,22,0.2);
+}
+
+/* Task Comments */
+.task-comment {
+  margin-top: 4px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Mobile responsive cards for table */
+@media (max-width: 900px) {
+  .tableWrap {
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+    background: transparent;
+  }
+  .table, .table tbody, .table tr, .table td {
+    display: block;
+    width: 100%;
+  }
+  .table thead {
+    display: none;
+  }
+  .table tr {
+    margin-bottom: 15px;
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--line-strong);
+    padding: 12px;
+    box-shadow: var(--shadow-1);
+    transition: transform 0.2s;
+  }
+  .table tr:hover td {
+    background: transparent !important;
+  }
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--line);
+    text-align: right;
+  }
+  .table td:last-child {
+    border-bottom: none;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 850;
+    color: var(--muted);
+    font-size: 11px;
+    margin-right: 15px;
+    text-align: left;
+    flex-shrink: 0;
+  }
+  .table td:nth-child(1)::before { content: "ID"; }
+  .table td:nth-child(2)::before { content: "タイトル"; }
+  
+  .table th:nth-child(1), .table td:nth-child(1),
+  .table th:nth-child(3), .table td:nth-child(3),
+  .table th:nth-child(4), .table td:nth-child(4) {
+    position: static;
+    box-shadow: none;
+    border-right: none;
+  }
+  
+  .card-title-mobile {
+    text-align: right;
+    white-space: normal;
+    word-break: break-word;
+  }
+  .table td:nth-child(2) {
+    max-width: none;
+    white-space: normal;
+    align-items: flex-start;
+  }
+}

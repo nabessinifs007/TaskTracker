@@ -58,6 +58,7 @@
       <div class="row row--space">
         <div class="row">
           <button id="btnNewTask" class="btn">＋ 新規タスク</button>
+          <button id="btnExportCsv" class="btn btn--ghost">CSV出力</button>
         </div>
 
         <div class="row">
@@ -172,9 +173,9 @@
         <div class="notice" id="dlgNotice"></div>
       </div>
 
-      <div class="dialog__footer">
         <div class="row">
           <button id="btnSaveEvent" class="btn btn--primary" value="ok">保存する</button>
+        </div>
       </div>
     </form>
   </dialog>
@@ -185,19 +186,17 @@
       <div class="dialog__header">
         <div>
           <div class="dialog__title">使い方（トラッくん）</div>
-          <div class="dialog__subtitle">サーバ無し（file://）で共有する手順だ！</div>
+          <div class="dialog__subtitle">クラウド同期版だ！</div>
         </div>
         <button class="btn btn--ghost" value="cancel">閉じる</button>
       </div>
 
       <div class="dialog__content">
         <ol class="help">
-          <li>共有フォルダの <code>index.html</code> を開く（file://）。</li>
-          <li><b>スナップショット</b>：<code>data/snapshot/tasks_snapshot.json</code> を選ぶ。</li>
-          <li><b>イベント</b>：<code>data/events/</code> の <code>*.json</code> を必要分だけ複数選択（無ければ未選択でOK）。</li>
-          <li>「読み込み」で一覧と集計が出る！</li>
-          <li>更新は「編集」→「イベント生成（DL）」→ <code>data/events/</code> に保存。これが共有のカギだ。</li>
-          <li>イベントが増えてきたら「スナップショット生成（DL）」で軽量化していこう。</li>
+          <li>「＋新規タスク」ボタンからタスクを作成してくれ。</li>
+          <li>作成・編集・ステータス変更した瞬間、自動的にクラウドへ保存されメンバー全員と共有されるぞ！</li>
+          <li>ステータスは一覧画面のバッジからも直接変更できる（インライン編集）。</li>
+          <li>データが必要なときは「CSV出力」ボタンで一覧結果をダウンロードして活用しよう。</li>
         </ol>
       </div>
 
@@ -213,6 +212,9 @@
     <img src="./assets/torakun_full_cut.png" alt="" draggable="false" />
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app.js"></script>
+  <script src="./src/utils.js"></script>
+  <script src="./src/api.js"></script>
+  <script src="./src/ui.js"></script>
+  <script src="./src/main.js"></script>
 </body>
 </html>
