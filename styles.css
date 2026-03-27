@@ -371,7 +371,7 @@ tr:hover td{
 .table th:nth-child(5), .table td:nth-child(5){ width:70px; }
 .table th:nth-child(6), .table td:nth-child(6){ width:105px; }
 .table th:nth-child(7), .table td:nth-child(7){ width:150px; }
-.table th:nth-child(8), .table td:nth-child(8){ width:80px; }
+.table th:nth-child(8), .table td:nth-child(8){ width:130px; }
 
 /* title ellipsis */
 .table td:nth-child(2){
