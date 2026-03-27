@@ -100,13 +100,6 @@
     </section>
   </main>
 
-  <div class="torakunDock" aria-hidden="true">
-    <div class="toraSpeechBubble">
-      <p id="torakunTalkText">任せろ！ まずは「+新規タスク」だ。<br>ひとつ作れば全部動き出すぞ！ 🐯</p>
-    </div>
-    <img src="./assets/torakun_full_cut.png" alt="" />
-  </div>
-
   <!-- タスク編集/新規（モーダル） -->
   <dialog id="taskDialog" class="dialog">
     <form method="dialog" class="dialog__body">
@@ -213,7 +206,12 @@
       </div>
     </form>
   </dialog>
-
+  <div class="torakunDock" aria-hidden="true">
+    <div class="toraSpeechBubble">
+      <p id="torakunTalkText">任せろ！ まずは「+新規タスク」だ。<br>ひとつ作れば全部動き出すぞ！ 🐯</p>
+    </div>
+    <img src="./assets/torakun_full_cut.png" alt="" draggable="false" />
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./app.js"></script>
 </body>

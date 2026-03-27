@@ -539,12 +539,20 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   display: flex;
   flex-direction: column; /* 吹き出しを上、画像を下に */
   align-items: flex-end; /* 右寄せ */
-  pointer-events: none; /* マウスイベントを通す */
+  cursor: grab;
 }
-.torakunDock img{
+
+/* つかんでいる最中のカーソル */
+.torakunDock:active {
+  cursor: grabbing;
+}
+
+.torakunDock img {
   width: 100%;
   height: auto;
   object-fit: contain;
+  pointer-events: none; /* 画像自体のブラウザデフォルトドラッグを防ぐ */
+  animation: floatTorakun 3s ease-in-out infinite; /* ふわふわ維持 */
 }
 @media (max-width: 900px){
   .torakunDock{ width: 140px; }
@@ -629,29 +637,28 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
 }
 
 /* 2. 吹き出し本体 */
+/* 吹き出し（トラッくんの頭上に配置） */
 .toraSpeechBubble {
-  position: relative;
-  background: #ffffff; /* 白い背景 */
-  border: 2px solid var(--tora); /* トラッくんカラーの枠線 */
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+  background: #ffffff;
+  border: 2px solid var(--tora);
   border-radius: var(--radius);
-  padding: 12px 16px;
-  box-shadow: var(--shadow-3); /* 強めの影 */
-  margin-bottom: -10px; /* トラッくんの頭に少し重ねる */
-  margin-right: 80px; /* ★ トラッくんの口元に寄せる */
-  z-index: 1001; /* トラッくん本体より上に */
-  opacity: 1; /* 常に表示 */
-  max-width: 400px; /* 吹き出しの最大幅 */
-  width: 250px;     /* ★ 新しく追加。ここの数値を大きくするほど左に広がります（例: 280px, 300px など） */
-  transition: opacity 0.3s;
-  /* 吹き出しもふわふわ動かす */
+  padding: 10px 14px;
+  box-shadow: var(--shadow-3);
+  width: max-content;
+  max-width: 250px;
   animation: floatBubble 3s ease-in-out infinite;
 }
 
 /* 吹き出しのテキスト */
 .toraSpeechBubble p {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.5;
   font-weight: 600;
   color: var(--text);
   text-align: center;
@@ -661,13 +668,25 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
 .toraSpeechBubble::after {
   content: "";
   position: absolute;
-  bottom: -15px; /* 下にはみ出す */
-  right: 50px; /* ★ トラッくんの口元の真上あたりを指す */
-  border-width: 15px 12px 0;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 10px 10px 0;
   border-style: solid;
-  border-color: #ffffff transparent; /* 白い三角 */
-  /* 三角部分にも影を付ける */
-  filter: drop-shadow(0 6px 10px rgba(138, 64, 18, 0.1));
+  border-color: #ffffff transparent transparent transparent;
+  z-index: 2;
+}
+
+.toraSpeechBubble::before {
+  content: "";
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 12px 12px 0;
+  border-style: solid;
+  border-color: var(--tora) transparent transparent transparent;
+  z-index: 1;
 }
 
 /* トラッくん本体のアニメーション定義（既に定義されているはずだが、念のため） */
@@ -680,6 +699,6 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
 /* 吹き出し専用のふわふわアニメーション定義 */
 @keyframes floatBubble {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); } /* 画像より少し大きく動かす */
+  50% { transform: translateY(-7px); } /* 画像より少し大きく動かす */
 }
 /* ▲▲ ここまで ▲▲ */

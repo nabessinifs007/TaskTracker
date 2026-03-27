@@ -167,6 +167,9 @@
 
     // 起動時に自動でデータ取得
     fetchTasks();
+
+    // ★これを追加！トラッくんをドラッグ可能にする
+    setupDraggableTorakun();
   }
 
   /* =========================
@@ -659,6 +662,89 @@
 
     // 決定したメッセージをHTMLに差し込む
     torakunTalkText.innerHTML = msg;
+  }
+/* =========================
+     トラッくんのドラッグ＆ドロップ機能
+     ========================= */
+  function setupDraggableTorakun() {
+    const dock = el("torakunDock");
+    if (!dock) return;
+
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    // 前回移動した場所を記憶していれば復元する
+    const savedPos = localStorage.getItem("torakunPos");
+    if (savedPos) {
+      const { left, top } = JSON.parse(savedPos);
+      dock.style.left = left;
+      dock.style.top = top;
+      dock.style.right = "auto";
+      dock.style.bottom = "auto";
+    }
+
+    // マウス・タッチ操作のイベント登録
+    dock.addEventListener("mousedown", dragStart);
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", dragEnd);
+
+    dock.addEventListener("touchstart", dragStart, { passive: false });
+    document.addEventListener("touchmove", drag, { passive: false });
+    document.addEventListener("touchend", dragEnd);
+
+    function dragStart(e) {
+      // 吹き出しの中のテキストをクリックした時はドラッグしない
+      if (e.target.closest('.toraSpeechBubble')) return; 
+
+      isDragging = true;
+
+      // タッチかマウスか判定
+      const clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+      const clientY = e.type.includes("touch") ? e.touches[0].clientY : e.clientY;
+
+      startX = clientX;
+      startY = clientY;
+
+      // 現在の要素の位置を取得
+      const rect = dock.getBoundingClientRect();
+      initialLeft = rect.left;
+      initialTop = rect.top;
+
+      // 右・下固定(right/bottom)を解除し、左・上固定(left/top)に切り替える
+      dock.style.right = "auto";
+      dock.style.bottom = "auto";
+      dock.style.left = initialLeft + "px";
+      dock.style.top = initialTop + "px";
+      
+      // ふわふわアニメーションが一瞬止まらないようにtransitionは触らない
+    }
+
+    function drag(e) {
+      if (!isDragging) return;
+      e.preventDefault(); // スマホで画面がスクロールするのを防ぐ
+
+      const clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+      const clientY = e.type.includes("touch") ? e.touches[0].clientY : e.clientY;
+
+      // どれだけマウスを動かしたか計算
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      // 要素を移動させる
+      dock.style.left = `${initialLeft + dx}px`;
+      dock.style.top = `${initialTop + dy}px`;
+    }
+
+    function dragEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+
+      // 移動した後の場所をブラウザ（ローカルストレージ）に保存！
+      localStorage.setItem("torakunPos", JSON.stringify({
+        left: dock.style.left,
+        top: dock.style.top
+      }));
+    }
   }
 
   /* =========================
