@@ -640,7 +640,7 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
 .toraSpeechBubble {
   position: absolute;
   bottom: 85%; /* トラッくんの顔の少し上くらいまで下げる */
-  left: -70px; /* 中央揃えをやめて、左側（顔の側）に寄せる */
+  left: -100px; /* 中央揃えをやめて、左側（顔の側）に寄せる */
   margin-bottom: 5px;
   background: #ffffff;
   border: 2px solid var(--tora);
@@ -667,7 +667,7 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   content: "";
   position: absolute;
   bottom: -10px;
-  left: 125px; /* トラッくんの口元に合わせてしっぽの位置を左にずらす */
+  left: 150px; /* トラッくんの口元に合わせてしっぽの位置を左にずらす */
   border-width: 10px 10px 0; /* まっすぐ下に向かって尖る */
   border-style: solid;
   border-color: #ffffff transparent transparent transparent;
@@ -678,7 +678,7 @@ dialog::backdrop{ background: rgba(16,24,40,.55); }
   content: "";
   position: absolute;
   bottom: -13px;
-  left: 123px; /* 枠線の太さ（2px）分ずらす */
+  left: 147px; /* 枠線の太さ（2px）分ずらす */
   border-width: 12px 12px 0;
   border-style: solid;
   border-color: var(--tora) transparent transparent transparent;
